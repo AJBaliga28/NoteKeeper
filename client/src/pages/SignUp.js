@@ -1,32 +1,24 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { signupUser } from "../api";
 import { FaArrowRight } from "react-icons/fa";
 import "../styles/Common.css";
 
 const SignUp = () => {
-  const [state, setState] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [state, setState] = useState({ username: "", email: "", password: "" });
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setState((prevState) => ({ ...prevState, [name]: value }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(state);
     try {
-      const response = await axios.post("http://localhost:5000/signup", state);
-      console.log(response.data); // handle successful response
-      // Possibly redirect or update UI based on response
+      await signupUser(state);
+      alert("Signup successful!");
+      // Possibly redirect or update UI
     } catch (error) {
-      console.error(error); // handle error response
+      console.error("There was an error signing up:", error);
       // Show error message to user
     }
   };
@@ -45,7 +37,6 @@ const SignUp = () => {
             required
           />
         </div>
-
         <div className="form-control">
           <label>Email</label>
           <input

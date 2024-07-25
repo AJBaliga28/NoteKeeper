@@ -1,45 +1,30 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { loginUser } from "../api";
 import { FaArrowRight } from "react-icons/fa";
 import "../styles/Common.css";
 
 const Login = () => {
   const navigate = useNavigate();
-
-  const [state, setState] = useState({
-    email: "",
-    password: "",
-  });
+  const [state, setState] = useState({ email: "", password: "" });
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setState((prevState) => ({ ...prevState, [name]: value }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(state);
     try {
-      const response = await axios.post("http://localhost:5000/login", state);
-      console.log(response.data); // handle successful response
-      // Possibly redirect or update UI based on response
-
+      const response = await loginUser(state);
       if (response.status === 200) {
-        // Store the JWT token in local storage
         const token = response.data.token;
         localStorage.setItem("token", token);
-        // Alert for successful login
         alert("Login successful!");
-        // Redirect to the "/create" page
         navigate("/create");
-        // console.log("Reached.");
       }
     } catch (error) {
-      console.error(error); // handle error response
+      console.error("There was an error logging in:", error);
       // Show error message to user
     }
   };
