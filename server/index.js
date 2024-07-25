@@ -5,12 +5,11 @@ const bodyParser = require("body-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const secretKey = "your_secret_key"; // Replace with your secret
-
+require("dotenv").config();
 const PORT = 5000;
 
-const uri =
-  "mongodb+srv://admin:admin@cluster0.pwtih72.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.MONGODB_URI;
+const secretKey = process.env.SECRET_KEY;
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -53,80 +52,6 @@ app.get("/", (req, res) => {
   res.send("Hello World.");
 });
 
-// Getting all the note items
-// app.get("/api/notes", async (req, res) => {
-//   try {
-//     const notes = await collection.find({}).toArray();
-//     res.status(200).send(notes);
-//   } catch (err) {
-//     console.error(`Failed to retrieve notes: ${err}\n`);
-//     res.status(500).send({ message: "An error occurred." });
-//   }
-// });
-
-// Creating note items
-// app.post("/api/notes", async (req, res) => {
-//   const newNote = { ...req.body, status: "incomplete" };
-//   console.log(newNote);
-//   try {
-//     console.log("Before.");
-//     const result = await collection.insertOne(newNote);
-//     console.log("After.");
-//     console.log(result);
-//     res.status(201).send(result);
-//   } catch (err) {
-//     console.error(`Failed to create note: ${err}\n`);
-//     res.status(500).send({ message: "An error occurred." });
-//   }
-// });
-
-// Updating the note items
-// app.put("/api/notes/:id", async (req, res) => {
-//   const noteID = req.params.id;
-//   if (!ObjectId.isValid(noteID)) {
-//     return res.status(400).send({ message: "Invalid ID format." });
-//   }
-//   const updatedNote = req.body;
-//   console.log(updatedNote);
-//   try {
-//     const result = await collection.updateOne(
-//       { _id: new ObjectId(noteID) },
-//       { $set: updatedNote }
-//     );
-//     console.log(result);
-//     if (result.matchedCount === 0) {
-//       res.status(404).send({ message: `Note with ID: ${noteID} not found.` });
-//     } else {
-//       res.status(200).send(updatedNote);
-//     }
-//   } catch (err) {
-//     console.error(`Failed to update note: ${err}\n`);
-//     res.status(500).send({ message: "An error occurred." });
-//   }
-// });
-
-// Deleting note items
-// app.delete("/api/notes/:id", async (req, res) => {
-//   const noteID = req.params.id;
-//   if (!ObjectId.isValid(noteID)) {
-//     return res.status(400).send({ message: "Invalid ID format." });
-//   }
-//   console.log("noteID: ", noteID);
-//   try {
-//     const result = await collection.deleteOne({ _id: new ObjectId(noteID) });
-//     console.log("result: ", result);
-//     if (result.deletedCount === 0) {
-//       res.status(404).send({ message: `Note with ID: ${noteID} not found.` });
-//     } else {
-//       res.status(200).send({ message: `Note with ID: ${noteID} deleted.` });
-//     }
-//   } catch (err) {
-//     console.error(`Failed to delete note: ${err}\n`);
-//     res.status(500).send({ message: "An error occurred." });
-//   }
-// });
-
-// Signup route
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -145,7 +70,6 @@ app.post("/signup", async (req, res) => {
       email,
       password: hashedPassword,
     });
-    console.log(result);
     res
       .status(201)
       .send({ message: "User created.", userId: result.insertedId });
@@ -158,11 +82,11 @@ app.post("/signup", async (req, res) => {
 // Login route
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  console.log(password);
+
   try {
     // Find the user
     const user = await collectionUsers.findOne({ email });
-    console.log(user);
+
     if (!user) {
       return res.status(400).send({ message: "Invalid credentials." });
     }
@@ -186,7 +110,6 @@ app.post("/login", async (req, res) => {
 
 // Middleware to authenticate and extract user info
 const authenticateToken = (req, res, next) => {
-  // console.log(req.headers);
   const token = req.headers["authorization"].split(" ")[1];
   if (!token) return res.sendStatus(401);
 
@@ -246,12 +169,9 @@ app.get("/api/notes", extractUserId, async (req, res) => {
 // Apply the middleware to routes that require it
 app.post("/api/notes", extractUserId, async (req, res) => {
   const newNote = { ...req.body, userId: req.userId, status: "incomplete" };
-  console.log(newNote);
+
   try {
-    console.log("Before.");
     const result = await collection.insertOne(newNote);
-    console.log("After.");
-    // console.log(result);
     res.status(201).send(result);
   } catch (err) {
     console.error(`Failed to create note: ${err}\n`);
@@ -261,17 +181,14 @@ app.post("/api/notes", extractUserId, async (req, res) => {
 
 app.delete("/api/notes/:id", extractUserId, async (req, res) => {
   const noteID = req.params.id;
-  // console.log(req.body);
   if (!ObjectId.isValid(noteID)) {
     return res.status(400).send({ message: "Invalid ID format." });
   }
-  console.log("noteID: ", noteID);
   try {
     const result = await collection.deleteOne({
       _id: new ObjectId(noteID),
       userId: req.userId,
     });
-    // console.log("result: ", result);
     if (result.deletedCount === 0) {
       res.status(404).send({ message: `Note with ID: ${noteID} not found.` });
     } else {
@@ -289,13 +206,11 @@ app.put("/api/notes/:id", extractUserId, async (req, res) => {
     return res.status(400).send({ message: "Invalid ID format." });
   }
   const updatedNote = req.body;
-  console.log(updatedNote);
   try {
     const result = await collection.updateOne(
       { _id: new ObjectId(noteID), userId: req.userId }, // Ensure the note belongs to the user
       { $set: updatedNote }
     );
-    console.log(result);
     if (result.matchedCount === 0) {
       res.status(404).send({ message: `Note with ID: ${noteID} not found.` });
     } else {
