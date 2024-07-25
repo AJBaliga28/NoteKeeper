@@ -1,0 +1,23 @@
+footer {
+  text-align: center;
+  padding: 3px;
+  /* background-color: DarkSalmon; */
+  color: white;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer-para {
+  color: purple;
+  margin-top: 15px;
+}
+
+.github-link {
+  text-decoration: none;
+  color: purple;
+}
+
+hr {
+  border-color: white;
+}

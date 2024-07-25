@@ -1,0 +1,47 @@
+* {
+  padding: 10;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: "Montserrat", sans-serif;
+}
+
+body {
+  background: #f0bd16;
+  padding: 0 16px;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #9933ff;
+  margin: auto -16px;
+  padding: 16px 32px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+nav h2 {
+  color: #fff;
+  font-family: "McLaren", cursive;
+  font-weight: 200;
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.home-btn,
+.login-btn,
+.acc-btn {
+  margin-right: 8px;
+  color: #fff;
+}
+
+a {
+  color: #fff;
+  text-decoration: none;
+}

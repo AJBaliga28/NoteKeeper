@@ -1,0 +1,29 @@
+.not-found-container {
+  text-align: center;
+  padding: 50px;
+  height: 100vh; /* Or adjust as needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  font-size: 36px;
+  color: #333;
+}
+
+p {
+  margin-top: 20px;
+  color: #666;
+}
+
+.link-home {
+  text-decoration: none;
+  color: #007bff;
+  margin-top: 20px;
+}
+
+.link-home:hover {
+  text-decoration: underline;
+}

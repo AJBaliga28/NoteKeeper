@@ -1,0 +1,55 @@
+.note {
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: 0 2px 5px #ccc;
+  padding: 10px;
+  width: 240px;
+  margin: 16px;
+  float: left;
+}
+
+.note-complete {
+  background: #d3ffd3; /* Change background color for complete notes */
+  text-decoration: line-through;
+}
+
+.note h1 {
+  font-size: 1.1em;
+  margin-bottom: 6px;
+}
+
+.note p {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.note input,
+.note textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+  font-size: 1em;
+}
+
+.note button {
+  position: relative;
+  margin-right: 10px;
+  color: #9933ff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  outline: none;
+}
+
+.del-btn,
+.check-btn {
+  float: right;
+}
+
+.edit-btn,
+.save-btn {
+  float: left;
+}
