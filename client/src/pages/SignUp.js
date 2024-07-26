@@ -60,7 +60,7 @@ const SignUp = () => {
             required
           />
         </div>
-        <button type="submit">
+        <button className="submit-btn" type="submit">
           <FaArrowRight />
         </button>
       </form>

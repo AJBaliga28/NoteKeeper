@@ -1,7 +1,7 @@
 // Navbar.js
 
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaRegStickyNote } from "react-icons/fa";
 import { MdAccountCircle } from "react-icons/md";
 import { FiLogIn } from "react-icons/fi";
@@ -9,7 +9,6 @@ import "../styles/Navbar.css";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Manage login state
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,7 +19,7 @@ const Navbar = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     alert("You have successfully logged out.");
-    navigate("/login"); // Navigate to the login page after logout
+    window.location.href = "/login"; // Redirect to login if no token
   };
 
   return (

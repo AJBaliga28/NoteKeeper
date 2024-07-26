@@ -115,11 +115,10 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Middleware to authenticate and extract user info
-const authenticateToken = (req, res, next) => {
+const authenticateAndExtractUser = (req, res, next) => {
+  console.log("From Authenticate Token - req.headers: ", req.headers);
   const authHeader = req.headers["authorization"];
 
-  // Check if the authorization header exists
   if (!authHeader) {
     console.error("Authorization header missing");
     return res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -127,7 +126,6 @@ const authenticateToken = (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  // Check if the token is present after splitting
   if (!token) {
     console.error("Token missing in authorization header");
     return res.status(401).json({ message: "Unauthorized: Token missing" });
@@ -139,19 +137,28 @@ const authenticateToken = (req, res, next) => {
       return res.status(403).json({ message: "Forbidden: Invalid token" });
     }
 
-    // Ensure user object has userId
     if (!user || !user.userId) {
       console.error("User ID missing in token payload");
       return res.status(400).json({ message: "User ID missing from request" });
     }
 
     req.user = user; // Save user info in request
+
+    // Extract User ID from headers if needed
+    const userIdFromHeader = req.headers["user-id-header"];
+    if (userIdFromHeader && userIdFromHeader !== user.userId) {
+      console.error("User ID in header does not match token");
+      return res.status(400).json({ message: "User ID mismatch" });
+    }
+
+    req.userId = user.userId || userIdFromHeader;
+
     next();
   });
 };
 
 // User info route
-app.get("/api/user", authenticateToken, async (req, res) => {
+app.get("/api/user", authenticateAndExtractUser, async (req, res) => {
   try {
     const userId = req.user.userId;
     const user = await collectionUsers.findOne({ _id: new ObjectId(userId) });
@@ -164,22 +171,7 @@ app.get("/api/user", authenticateToken, async (req, res) => {
   }
 });
 
-const extractUserId = (req, res, next) => {
-  try {
-    // Ensure that authenticateToken has run and added user info to the request
-    if (!req.user || !req.user.userId) {
-      return res.status(400).json({ error: "User ID missing from request" });
-    }
-
-    req.userId = req.user.userId;
-    next();
-  } catch (error) {
-    console.error("Error extracting User ID:", error);
-    res.status(500).json({ error: "Failed to extract User ID" });
-  }
-};
-
-app.get("/api/notes", extractUserId, async (req, res) => {
+app.get("/api/notes", authenticateAndExtractUser, async (req, res) => {
   try {
     // Use the userId extracted by the middleware
     const userId = req.userId;
@@ -198,7 +190,7 @@ app.get("/api/notes", extractUserId, async (req, res) => {
 });
 
 // Apply the middleware to routes that require it
-app.post("/api/notes", extractUserId, async (req, res) => {
+app.post("/api/notes", authenticateAndExtractUser, async (req, res) => {
   const newNote = { ...req.body, userId: req.userId, status: "incomplete" };
   console.log(newNote);
   try {
@@ -210,7 +202,7 @@ app.post("/api/notes", extractUserId, async (req, res) => {
   }
 });
 
-app.delete("/api/notes/:id", extractUserId, async (req, res) => {
+app.delete("/api/notes/:id", authenticateAndExtractUser, async (req, res) => {
   const noteID = req.params.id;
   if (!ObjectId.isValid(noteID)) {
     return res.status(400).send({ message: "Invalid ID format." });
@@ -231,7 +223,7 @@ app.delete("/api/notes/:id", extractUserId, async (req, res) => {
   }
 });
 
-app.put("/api/notes/:id", extractUserId, async (req, res) => {
+app.put("/api/notes/:id", authenticateAndExtractUser, async (req, res) => {
   const noteID = req.params.id;
   if (!ObjectId.isValid(noteID)) {
     return res.status(400).send({ message: "Invalid ID format." });

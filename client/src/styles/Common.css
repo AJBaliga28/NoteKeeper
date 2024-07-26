@@ -38,19 +38,18 @@
   box-sizing: border-box;
 }
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
+.submit-btn {
+  /* width: 100%; */
+  /* padding: 10px; */
+  /* background-color: #007bff; */
   border: none;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   color: #fff;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
-button:hover {
+.submit-btn:hover {
   background-color: #0056b3;
 }
 
@@ -68,4 +67,12 @@ button:hover {
 
 .connecting-para a:hover {
   text-decoration: underline;
+}
+
+.error-message {
+  margin-top: 10px; /* Add some space above the error message */
+  padding: 10px;
+  border-radius: 4px;
+  color: #dc3545; /* Red color for error */
+  background-color: #f8d7da; /* Light red background */
 }

@@ -7,25 +7,34 @@ import "../styles/Common.css";
 const Login = () => {
   const navigate = useNavigate();
   const [state, setState] = useState({ email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setState((prevState) => ({ ...prevState, [name]: value }));
+    setErrorMessage(""); // Clear error on input change
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true); // Start loading
     try {
       const response = await loginUser(state);
       if (response.status === 200) {
         const token = response.data.token;
         localStorage.setItem("token", token);
-        alert("Login successful!");
-        navigate("/create");
+        alert("Successfully logged in.");
+        setErrorMessage(""); // Clear error message
+        setTimeout(() => {
+          navigate("/create");
+        }, 1500);
       }
     } catch (error) {
       console.error("There was an error logging in:", error);
-      // Show error message to user
+      setErrorMessage("Invalid email or password.");
+    } finally {
+      setIsLoading(false); // End loading
     }
   };
 
@@ -53,8 +62,9 @@ const Login = () => {
             required
           />
         </div>
-        <button type="submit">
-          <FaArrowRight />
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        <button className="submit-btn" type="submit" disabled={isLoading}>
+          {isLoading ? "Loading..." : <FaArrowRight />}
         </button>
       </form>
       <p className="connecting-para">

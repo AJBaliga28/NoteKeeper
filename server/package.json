@@ -4,7 +4,7 @@
   "description": "Backend for Notes Keeper.",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon server",
+    "server": "nodemon index.js",
     "client": "npm start --prefix client"
   },
   "keywords": [],
