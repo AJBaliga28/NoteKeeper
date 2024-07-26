@@ -117,17 +117,14 @@ app.post("/login", async (req, res) => {
 
 // Middleware to authenticate and extract user info
 const authenticateToken = (req, res, next) => {
-  // Get the authorization header
   const authHeader = req.headers["authorization"];
 
-  console.log(req);
   // Check if the authorization header exists
   if (!authHeader) {
     console.error("Authorization header missing");
     return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
-  // Extract the token from the authorization header
   const token = authHeader.split(" ")[1];
 
   // Check if the token is present after splitting
@@ -136,12 +133,18 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized: Token missing" });
   }
 
-  // Verify the token using jwt
   jwt.verify(token, secretKey, (err, user) => {
     if (err) {
       console.error("Token verification failed", err);
       return res.status(403).json({ message: "Forbidden: Invalid token" });
     }
+
+    // Ensure user object has userId
+    if (!user || !user.userId) {
+      console.error("User ID missing in token payload");
+      return res.status(400).json({ message: "User ID missing from request" });
+    }
+
     req.user = user; // Save user info in request
     next();
   });
@@ -163,15 +166,15 @@ app.get("/api/user", authenticateToken, async (req, res) => {
 
 const extractUserId = (req, res, next) => {
   try {
-    const userId = req.headers["user-id-header"];
-
-    if (!userId) {
+    // Ensure that authenticateToken has run and added user info to the request
+    if (!req.user || !req.user.userId) {
       return res.status(400).json({ error: "User ID missing from request" });
     }
 
-    req.userId = userId;
+    req.userId = req.user.userId;
     next();
   } catch (error) {
+    console.error("Error extracting User ID:", error);
     res.status(500).json({ error: "Failed to extract User ID" });
   }
 };
