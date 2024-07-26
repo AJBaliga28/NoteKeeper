@@ -53,8 +53,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/users", async (req, res) => {
-  const allUsers = await collectionUsers.find();
-  res.send(allUsers);
+  collectionUsers.find().toArray(function (err, docs) {
+    console.log(JSON.stringify(docs));
+  });
 });
 
 app.post("/signup", async (req, res) => {
