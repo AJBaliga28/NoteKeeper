@@ -20,7 +20,7 @@ const Keeper = () => {
       try {
         const userResponse = await getUser();
         setUsername(userResponse.data.username);
-
+        console.log(userResponse.data);
         const notesResponse = await getNotes();
         console.log(notesResponse);
         setNotes(notesResponse.data);

@@ -49,13 +49,14 @@ connectToDatabase();
 
 // Main route
 app.get("/", (req, res) => {
-  res.send("Hello World.");
+  res.send("<h1> Hello World! </h1>");
 });
 
 app.get("/api/users", async (req, res) => {
   collectionUsers.find().toArray(function (err, docs) {
     console.log(JSON.stringify(docs));
   });
+  res.send("Hello users.");
 });
 
 app.post("/signup", async (req, res) => {
@@ -116,7 +117,7 @@ app.post("/login", async (req, res) => {
 
 // Middleware to authenticate and extract user info
 const authenticateToken = (req, res, next) => {
-  const token = req.headers["authorization"].split(" ")[1];
+  const token = req.headers["Authorization"].split(" ")[1];
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, secretKey, (err, user) => {
