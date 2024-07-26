@@ -120,6 +120,7 @@ const authenticateToken = (req, res, next) => {
   // Get the authorization header
   const authHeader = req.headers["authorization"];
 
+  console.log(req);
   // Check if the authorization header exists
   if (!authHeader) {
     console.error("Authorization header missing");
