@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { signupUser } from "../api";
 import { FaArrowRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "../styles/Common.css";
 
 const SignUp = () => {
   const [state, setState] = useState({ username: "", email: "", password: "" });
+  const navigate = useNavigate();
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -17,6 +19,7 @@ const SignUp = () => {
       await signupUser(state);
       alert("Signup successful!");
       // Possibly redirect or update UI
+      navigate("/login");
     } catch (error) {
       console.error("There was an error signing up:", error);
       // Show error message to user

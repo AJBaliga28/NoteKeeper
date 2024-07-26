@@ -52,6 +52,11 @@ app.get("/", (req, res) => {
   res.send("Hello World.");
 });
 
+app.get("/api/users", async (req, res) => {
+  const allUsers = await collectionUsers.find();
+  res.send(allUsers);
+});
+
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -159,6 +164,7 @@ app.get("/api/notes", extractUserId, async (req, res) => {
 
     // Retrieve notes for the specific user
     const notes = await collection.find({ userId: userId }).toArray();
+    console.log(notes);
     res.status(200).send(notes);
   } catch (err) {
     console.error(`Failed to retrieve notes: ${err}\n`);
@@ -169,7 +175,7 @@ app.get("/api/notes", extractUserId, async (req, res) => {
 // Apply the middleware to routes that require it
 app.post("/api/notes", extractUserId, async (req, res) => {
   const newNote = { ...req.body, userId: req.userId, status: "incomplete" };
-
+  console.log(newNote);
   try {
     const result = await collection.insertOne(newNote);
     res.status(201).send(result);

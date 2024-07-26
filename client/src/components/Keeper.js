@@ -22,6 +22,7 @@ const Keeper = () => {
         setUsername(userResponse.data.username);
 
         const notesResponse = await getNotes();
+        console.log(notesResponse);
         setNotes(notesResponse.data);
       } catch (error) {
         console.error("There was an error fetching data!", error);
@@ -34,6 +35,7 @@ const Keeper = () => {
   const handleAddNote = async (newNote) => {
     try {
       const response = await createNote(newNote);
+      console.log(newNote);
       setNotes((prevNotes) => [...prevNotes, response.data]);
     } catch (error) {
       console.error("There was an error creating the note!", error);
@@ -42,6 +44,7 @@ const Keeper = () => {
 
   const handleDeleteNote = async (id) => {
     try {
+      console.log(id);
       await deleteNote(id);
       setNotes((prevNotes) =>
         prevNotes.filter((noteItem) => noteItem._id !== id)
@@ -57,6 +60,7 @@ const Keeper = () => {
         title: newTitle,
         content: newContent,
       });
+      console.log(response);
       setNotes((prevNotes) =>
         prevNotes.map((noteItem) =>
           noteItem._id === id ? response.data : noteItem
