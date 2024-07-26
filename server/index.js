@@ -117,11 +117,30 @@ app.post("/login", async (req, res) => {
 
 // Middleware to authenticate and extract user info
 const authenticateToken = (req, res, next) => {
-  const token = req.headers["Authorization"].split(" ")[1];
-  if (!token) return res.sendStatus(401);
+  // Get the authorization header
+  const authHeader = req.headers["authorization"];
 
+  // Check if the authorization header exists
+  if (!authHeader) {
+    console.error("Authorization header missing");
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+
+  // Extract the token from the authorization header
+  const token = authHeader.split(" ")[1];
+
+  // Check if the token is present after splitting
+  if (!token) {
+    console.error("Token missing in authorization header");
+    return res.status(401).json({ message: "Unauthorized: Token missing" });
+  }
+
+  // Verify the token using jwt
   jwt.verify(token, secretKey, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) {
+      console.error("Token verification failed", err);
+      return res.status(403).json({ message: "Forbidden: Invalid token" });
+    }
     req.user = user; // Save user info in request
     next();
   });
