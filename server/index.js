@@ -189,13 +189,30 @@ app.get("/api/notes", authenticateAndExtractUser, async (req, res) => {
   }
 });
 
-// Apply the middleware to routes that require it
+// // Apply the middleware to routes that require it
+// app.post("/api/notes", authenticateAndExtractUser, async (req, res) => {
+//   const newNote = { ...req.body, userId: req.userId, status: "incomplete" };
+//   console.log(newNote);
+//   try {
+//     const result = await collection.insertOne(newNote);
+//     res.status(201).send(result);
+//   } catch (err) {
+//     console.error(`Failed to create note: ${err}\n`);
+//     res.status(500).send({ message: "An error occurred." });
+//   }
+// });
+
 app.post("/api/notes", authenticateAndExtractUser, async (req, res) => {
   const newNote = { ...req.body, userId: req.userId, status: "incomplete" };
-  console.log(newNote);
+  console.log("Creating new note:", newNote);
   try {
     const result = await collection.insertOne(newNote);
-    res.status(201).send(result);
+    if (result.insertedId) {
+      newNote._id = result.insertedId;
+      res.status(201).send(newNote); // Send the complete note object
+    } else {
+      res.status(500).send({ message: "Failed to create note." });
+    }
   } catch (err) {
     console.error(`Failed to create note: ${err}\n`);
     res.status(500).send({ message: "An error occurred." });
