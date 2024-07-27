@@ -11,21 +11,33 @@ function Note({ id, title, content, status, onSave, onCheck, onDelete }) {
     setIsEditing(true);
   }
 
-  function handleSave() {
-    setIsEditing(false);
-    onSave(id, editedTitle, editedContent); // Call onSave prop to save edited data
-  }
+  const handleCheck = (id, status) => {
+    console.log("Browser - ", id, status);
+    if (id && status) {
+      onCheck(id, status);
+    } else {
+      console.error("Note ID or status is undefined");
+    }
+  };
+  const handleDelete = (id) => {
+    if (id) {
+      onDelete(id);
+    } else {
+      console.error("Note ID is undefined");
+    }
+  };
 
-  function handleCheck() {
-    console.log("Browser - id: ", id);
-    console.log("Browser - status: ", status);
-
-    onCheck(id, status);
-  }
-
-  function handleDelete() {
-    onDelete(id);
-  }
+  const handleSave = () => {
+    console.log("From handleSave: ", id);
+    console.log("New Title and Content: ", editedTitle, editedContent);
+    console.log("After Edit: ", status);
+    if (id && editedTitle && editedContent) {
+      setIsEditing(false);
+      onSave(id, editedTitle, editedContent, status);
+    } else {
+      console.error("Note ID, title, or content is undefined");
+    }
+  };
 
   return (
     <div className={`note ${status === "complete" ? "note-complete" : ""}`}>
@@ -40,7 +52,7 @@ function Note({ id, title, content, status, onSave, onCheck, onDelete }) {
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
           />
-          <button className="save-btn" onClick={handleSave}>
+          <button className="save-btn" onClick={() => handleSave()}>
             <FaSave />
           </button>
         </>
@@ -51,10 +63,10 @@ function Note({ id, title, content, status, onSave, onCheck, onDelete }) {
           <button className="edit-btn" onClick={handleEdit}>
             <FaPencilAlt />
           </button>
-          <button className="del-btn" onClick={handleDelete}>
+          <button className="del-btn" onClick={() => handleDelete(id)}>
             <FaTrash />
           </button>
-          <button className="check-btn" onClick={handleCheck}>
+          <button className="check-btn" onClick={() => handleCheck(id, status)}>
             <FaCheck />
           </button>
         </>

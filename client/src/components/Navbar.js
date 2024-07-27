@@ -12,11 +12,12 @@ const Navbar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    setIsLoggedIn(token);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+
     setIsLoggedIn(false);
     alert("You have successfully logged out.");
     window.location.href = "/login"; // Redirect to login if no token

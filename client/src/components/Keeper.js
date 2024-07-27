@@ -17,6 +17,7 @@ const Keeper = () => {
   const [notes, setNotes] = useState([]);
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(""); // Added for error handling
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,7 +33,8 @@ const Keeper = () => {
 
         setNotes(notesResponse.data);
       } catch (error) {
-        console.error("There was an error fetching data!", error);
+        setError("Failed to fetch data. Please reload the browser.");
+        console.error("Error fetching data:", error);
       } finally {
         setIsLoading(false); // Set loading to false after fetching data
       }
@@ -41,9 +43,9 @@ const Keeper = () => {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    console.log("Notes state updated:", notes);
-  }, [notes]);
+  // useEffect(() => {
+  //   console.log("Notes state updated:", notes);
+  // }, [notes]);
 
   // Function to get user data
   const getUser = async () => {
@@ -78,72 +80,17 @@ const Keeper = () => {
 
       return response;
     } catch (error) {
-      console.error("Error fetching notes:", error);
+      setError("Failed to get the notes. Please reload the browser.");
+      console.error("Error getting notes:", error);
       throw error;
     }
   };
 
-  // Function to add a new note
-  // const handleAddNote = async (newNote) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       throw new Error("No token found");
-  //     }
-
-  //     const response = await api.post("/api/notes", newNote, {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-
-  //     setNotes((prevNotes) => [...prevNotes, response.data]);
-  //     console.log(notes);
-  //   } catch (error) {
-  //     console.error("There was an error creating the note!", error);
-  //   }
-  // };
-
-  // New Function
-  // const handleAddNote = async (newNote) => {
-  //   if (!newNote.title || !newNote.content) {
-  //     alert("Please enter both a title and content for the note!");
-  //     return; // Prevent adding the note if validation fails
-  //   }
-
-  //   try {
-  //     console.log(newNote);
-  //     // Optimistic update: add the new note to the state immediately with a temporary id
-  //     const tempId = Date.now().toString();
-  //     setNotes((prevNotes) => [...prevNotes, { ...newNote, _id: tempId }]);
-
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       throw new Error("No token found");
-  //     }
-
-  //     const response = await api.post("/api/notes", newNote, {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-
-  //     // Replace the temporary note with the one from the server
-  //     setNotes((prevNotes) =>
-  //       prevNotes.map((note) => (note._id === tempId ? response.data : note))
-  //     );
-  //   } catch (error) {
-  //     const tempId = Date.now().toString();
-  //     console.error("There was an error creating the note!", error);
-  //     // Remove the temporary note if there's an error
-  //     setNotes((prevNotes) => prevNotes.filter((note) => note._id !== tempId));
-  //   }
-  // };
-
   const handleAddNote = async (newNote) => {
     if (!newNote.title || !newNote.content) {
       alert("Please enter both a title and content for the note!");
-      return;
+      return; // Prevent adding the note if validation fails
     }
-
-    const tempId = Date.now().toString();
-    setNotes((prevNotes) => [...prevNotes, { ...newNote, _id: tempId }]);
 
     try {
       const token = localStorage.getItem("token");
@@ -155,28 +102,15 @@ const Keeper = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Assuming the response.data contains acknowledged and insertedId
-      if (response.data.acknowledged) {
-        setNotes((prevNotes) =>
-          prevNotes.map((note) =>
-            note._id === tempId
-              ? { ...newNote, _id: response.data.insertedId }
-              : note
-          )
-        );
-      } else {
-        // Handle the case where the note was not acknowledged
-        setNotes((prevNotes) =>
-          prevNotes.filter((note) => note._id !== tempId)
-        );
-        console.error("The note creation was not acknowledged by the server.");
-      }
+      setNotes((prevNotes) => [...prevNotes, response.data]);
+      console.log(notes);
     } catch (error) {
-      console.error("There was an error creating the note!", error);
-      setNotes((prevNotes) => prevNotes.filter((note) => note._id !== tempId));
+      setError("Failed to add the note. Please reload the browser.");
+      console.error("Error creating note:", error);
     }
   };
 
+  // Function to delete a note
   const handleDeleteNote = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -192,12 +126,14 @@ const Keeper = () => {
         prevNotes.filter((noteItem) => noteItem._id !== id)
       );
     } catch (error) {
-      console.error("There was an error deleting the note!", error);
+      setError("Failed to delete the note. Please reload the browser.");
+      console.error("Error deleting the note:", error);
     }
   };
 
   // Function to update a note's title and content
-  const handleSave = async (id, newTitle, newContent) => {
+  const handleSave = async (id, newTitle, newContent, status) => {
+    console.log(newTitle, newContent, status);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -209,6 +145,7 @@ const Keeper = () => {
         {
           title: newTitle,
           content: newContent,
+          status: status,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -221,26 +158,54 @@ const Keeper = () => {
         )
       );
     } catch (error) {
-      console.error("There was an error updating the note!", error);
+      setError("Failed to update the note. Please reload the browser.");
+      console.error("Error updating the note:", error);
     }
   };
 
   // Function to update the status of a note (complete/incomplete)
+  // const handleCheck = async (id, currentStatus) => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       throw new Error("No token found");
+  //     }
+
+  //     const newStatus =
+  //       currentStatus === "incomplete" ? "complete" : "incomplete";
+  //     await api.put(
+  //       `/api/notes/${id}`,
+  //       { status: newStatus },
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     setNotes((prevNotes) =>
+  //       prevNotes.map((noteItem) =>
+  //         noteItem._id === id ? { ...noteItem, status: newStatus } : noteItem
+  //       )
+  //     );
+  //   } catch (error) {
+  //     setError("Failed to update the note status. Please try again.");
+  //     console.error("Error updating note status:", error);
+  //   }
+  // };
+
+  // New
   const handleCheck = async (id, currentStatus) => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
+      if (!token) throw new Error("No token found");
 
       const newStatus =
         currentStatus === "incomplete" ? "complete" : "incomplete";
+      console.log("Updating note ID:", id, "New status:", newStatus); // Debugging log
+
       await api.put(
         `/api/notes/${id}`,
         { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setNotes((prevNotes) =>
@@ -249,7 +214,7 @@ const Keeper = () => {
         )
       );
     } catch (error) {
-      console.error("There was an error updating the note status!", error);
+      console.error("Error updating note status:", error);
     }
   };
 
@@ -272,10 +237,12 @@ const Keeper = () => {
           <h2 className="heading">
             {username ? "Welcome, " + username : "Username Loading..."}!
           </h2>
+
+          {error && <p className="error-message">{error}</p>}
           <CreateArea onAdd={handleAddNote} />
-          {notes.map((noteItem, index) => (
+          {notes.map((noteItem) => (
             <Note
-              key={index}
+              key={noteItem._id}
               id={noteItem._id}
               title={noteItem.title}
               content={noteItem.content}

@@ -20,15 +20,14 @@ const Login = () => {
     event.preventDefault();
     setIsLoading(true); // Start loading
     try {
+      console.log(state);
       const response = await loginUser(state);
       if (response.status === 200) {
         const token = response.data.token;
         localStorage.setItem("token", token);
         alert("Successfully logged in.");
         setErrorMessage(""); // Clear error message
-        setTimeout(() => {
-          navigate("/create");
-        }, 1500);
+        navigate("/create");
       }
     } catch (error) {
       console.error("There was an error logging in:", error);
@@ -41,6 +40,11 @@ const Login = () => {
   return (
     <div className="container">
       <h2 className="heading">Login</h2>
+      {isLoading && (
+        <div className="loading-overlay">
+          <p>Signing you in!</p>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="form-control">
           <label>Email</label>
@@ -64,7 +68,7 @@ const Login = () => {
         </div>
         {errorMessage && <p className="error-message">{errorMessage}</p>}
         <button className="submit-btn" type="submit" disabled={isLoading}>
-          {isLoading ? "Loading..." : <FaArrowRight />}
+          <FaArrowRight />
         </button>
       </form>
       <p className="connecting-para">
