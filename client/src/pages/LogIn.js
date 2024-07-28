@@ -39,7 +39,7 @@ const Login = () => {
 
   return (
     <div className="container">
-      <h2 className="heading">Login</h2>
+      <h2 className="heading">Login!</h2>
       {isLoading && (
         <div className="loading-overlay">
           <p>Signing you in!</p>

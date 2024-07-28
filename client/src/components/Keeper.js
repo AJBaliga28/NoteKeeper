@@ -157,6 +157,7 @@ const Keeper = () => {
           noteItem._id === id ? response.data : noteItem
         )
       );
+      console.log("After handleSave, id: ", id);
     } catch (error) {
       setError("Failed to update the note. Please reload the browser.");
       console.error("Error updating the note:", error);
@@ -214,6 +215,7 @@ const Keeper = () => {
         )
       );
     } catch (error) {
+      setError("Failed to update the note status. Please try again.");
       console.error("Error updating note status:", error);
     }
   };
@@ -223,6 +225,7 @@ const Keeper = () => {
       {isLoading ? (
         <div className="loader-container">
           <ColorRing
+            key={isLoading}
             visible={true}
             height="80"
             width="80"
@@ -240,9 +243,9 @@ const Keeper = () => {
 
           {error && <p className="error-message">{error}</p>}
           <CreateArea onAdd={handleAddNote} />
-          {notes.map((noteItem) => (
+          {notes.map((noteItem, id) => (
             <Note
-              key={noteItem._id}
+              key={id}
               id={noteItem._id}
               title={noteItem.title}
               content={noteItem.content}

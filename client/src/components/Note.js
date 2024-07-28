@@ -9,10 +9,11 @@ function Note({ id, title, content, status, onSave, onCheck, onDelete }) {
 
   function handleEdit() {
     setIsEditing(true);
+    console.log("handleEdit: ", id);
   }
 
   const handleCheck = (id, status) => {
-    console.log("Browser - ", id, status);
+    console.log("handleCheck note.js - ", id, status);
     if (id && status) {
       onCheck(id, status);
     } else {
@@ -20,6 +21,7 @@ function Note({ id, title, content, status, onSave, onCheck, onDelete }) {
     }
   };
   const handleDelete = (id) => {
+    console.log("handleDel note.js - ", id);
     if (id) {
       onDelete(id);
     } else {
@@ -28,12 +30,13 @@ function Note({ id, title, content, status, onSave, onCheck, onDelete }) {
   };
 
   const handleSave = () => {
-    console.log("From handleSave: ", id);
+    console.log("From handleSave: ");
     console.log("New Title and Content: ", editedTitle, editedContent);
     console.log("After Edit: ", status);
     if (id && editedTitle && editedContent) {
       setIsEditing(false);
       onSave(id, editedTitle, editedContent, status);
+      console.log("After handleSave - note.js", id);
     } else {
       console.error("Note ID, title, or content is undefined");
     }
@@ -52,7 +55,7 @@ function Note({ id, title, content, status, onSave, onCheck, onDelete }) {
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
           />
-          <button className="save-btn" onClick={() => handleSave()}>
+          <button className="save-btn" onClick={(id) => handleSave(id)}>
             <FaSave />
           </button>
         </>

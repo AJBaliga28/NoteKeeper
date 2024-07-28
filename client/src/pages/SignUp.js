@@ -6,6 +6,8 @@ import "../styles/Common.css";
 
 const SignUp = () => {
   const [state, setState] = useState({ username: "", email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
   const handleInputChange = (event) => {
@@ -21,14 +23,22 @@ const SignUp = () => {
       // Possibly redirect or update UI
       navigate("/login");
     } catch (error) {
+      setErrorMessage("Error when signing up.");
       console.error("There was an error signing up:", error);
       // Show error message to user
+    } finally {
+      setIsLoading(false); // End loading
     }
   };
 
   return (
     <div className="signup-container">
-      <h2 className="heading">Sign up</h2>
+      <h2 className="heading">Sign up!</h2>
+      {isLoading && (
+        <div className="loading-overlay">
+          <p>Signing you up!</p>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="form-control">
           <label>Username</label>
@@ -60,6 +70,7 @@ const SignUp = () => {
             required
           />
         </div>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
         <button className="submit-btn" type="submit">
           <FaArrowRight />
         </button>
